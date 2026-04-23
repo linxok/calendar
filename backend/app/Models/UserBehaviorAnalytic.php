@@ -10,7 +10,7 @@ class UserBehaviorAnalytic extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = 'user_behavior_analytics';
+    protected $table = 'user_behavior_analytics';
             
     protected $fillable = [
                 'user_id',
@@ -27,7 +27,7 @@ class UserBehaviorAnalytic extends Model
         'analyzed_at',
     ];
 
-    protected $fillable = [
+    protected $casts = [
         'feature_vector' => 'array',
         'preferred_masters' => 'array',
         'preferred_services' => 'array',
@@ -41,6 +41,6 @@ class UserBehaviorAnalytic extends Model
 
     public function user()
     {
-        return ->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 }

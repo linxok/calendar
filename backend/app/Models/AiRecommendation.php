@@ -10,7 +10,7 @@ class AiRecommendation extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = 'ai_recommendations';
+    protected $table = 'ai_recommendations';
             
     protected $fillable = [
                 'user_id',
@@ -26,7 +26,7 @@ class AiRecommendation extends Model
         'expires_at',
     ];
 
-    protected $fillable = [
+    protected $casts = [
         'suggested_date' => 'date',
         'suggested_time_slots' => 'array',
         'confidence_score' => 'decimal:4',
@@ -36,16 +36,16 @@ class AiRecommendation extends Model
 
     public function user()
     {
-        return ->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function service()
     {
-        return ->belongsTo(Service::class);
+        return $this->belongsTo(Service::class);
     }
 
     public function master()
     {
-        return ->belongsTo(MasterProfile::class, 'master_id');
+        return $this->belongsTo(MasterProfile::class, 'master_id');
     }
 }

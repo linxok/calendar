@@ -24,30 +24,23 @@ class Appointment extends Model
         'notes',
     ];
 
-    protected $fillable = [
-        'start_at' => 'datetime',
-        'end_at' => 'datetime',
-        'status' => 'string',
-        'source' => 'string',
-    ];
-
     public function client()
     {
-        return ->belongsTo(User::class, 'client_id');
+        return $this->belongsTo(User::class, 'client_id');
     }
 
     public function master()
     {
-        return ->belongsTo(MasterProfile::class, 'master_id');
+        return $this->belongsTo(MasterProfile::class, 'master_id');
     }
 
     public function service()
     {
-        return ->belongsTo(Service::class);
+        return $this->belongsTo(Service::class);
     }
 
     public function communicationLogs()
     {
-        return ->hasMany(CommunicationLog::class);
+        return $this->hasMany(CommunicationLog::class);
     }
 }

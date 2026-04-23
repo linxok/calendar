@@ -10,7 +10,7 @@ class TelegramBotUser extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = 'telegram_bot_users';
+    protected $table = 'telegram_bot_users';
             
     protected $fillable = [
                 'user_id',
@@ -25,7 +25,7 @@ class TelegramBotUser extends Model
         'last_message_at',
     ];
 
-    protected $fillable = [
+    protected $casts = [
         'chat_id' => 'integer',
         'is_bot' => 'boolean',
         'state_data' => 'array',
@@ -34,6 +34,6 @@ class TelegramBotUser extends Model
 
     public function user()
     {
-        return ->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 }

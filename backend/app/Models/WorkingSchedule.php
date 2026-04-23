@@ -19,7 +19,7 @@ class WorkingSchedule extends Model
         'breaks',
     ];
 
-    protected $fillable = [
+    protected $casts = [
         'day_of_week' => 'integer',
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
@@ -28,6 +28,6 @@ class WorkingSchedule extends Model
 
     public function master()
     {
-        return ->belongsTo(MasterProfile::class, 'master_id');
+        return $this->belongsTo(MasterProfile::class, 'master_id');
     }
 }

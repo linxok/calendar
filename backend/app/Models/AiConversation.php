@@ -10,28 +10,28 @@ class AiConversation extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = 'ai_conversations';
-            
+    protected $table = 'ai_conversations';
+
     protected $fillable = [
-                'user_id',
+        'user_id',
         'channel',
         'started_at',
         'ended_at',
         'status',
     ];
 
-    protected $fillable = [
+    protected $casts = [
         'started_at' => 'datetime',
         'ended_at' => 'datetime',
     ];
 
     public function user()
     {
-        return ->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function messages()
     {
-        return ->hasMany(AiMessage::class, 'conversation_id');
+        return $this->hasMany(AiMessage::class, 'conversation_id');
     }
 }

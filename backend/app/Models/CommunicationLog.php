@@ -10,7 +10,7 @@ class CommunicationLog extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = 'communication_logs';
+    protected $table = 'communication_logs';
             
     protected $fillable = [
                 'user_id',
@@ -30,7 +30,7 @@ class CommunicationLog extends Model
         'read_at',
     ];
 
-    protected $fillable = [
+    protected $casts = [
         'cost' => 'decimal:6',
         'sent_at' => 'datetime',
         'delivered_at' => 'datetime',
@@ -39,11 +39,11 @@ class CommunicationLog extends Model
 
     public function user()
     {
-        return ->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function appointment()
     {
-        return ->belongsTo(Appointment::class);
+        return $this->belongsTo(Appointment::class);
     }
 }

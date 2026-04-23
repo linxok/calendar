@@ -10,7 +10,7 @@ class UserCommunicationPreference extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = 'user_communication_preferences';
+    protected $table = 'user_communication_preferences';
             
     protected $fillable = [
                 'user_id',
@@ -53,7 +53,7 @@ class UserCommunicationPreference extends Model
         'do_not_disturb_end',
     ];
 
-    protected $fillable = [
+    protected $casts = [
         'telegram_enabled' => 'boolean',
         'telegram_confirmations' => 'boolean',
         'telegram_reminders' => 'boolean',
@@ -84,6 +84,6 @@ class UserCommunicationPreference extends Model
 
     public function user()
     {
-        return ->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 }

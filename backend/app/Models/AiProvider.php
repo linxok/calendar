@@ -10,7 +10,7 @@ class AiProvider extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = 'ai_providers';
+    protected $table = 'ai_providers';
             
     protected $fillable = [
                 'provider_key',
@@ -20,13 +20,13 @@ class AiProvider extends Model
         'config',
     ];
 
-    protected $fillable = [
+    protected $casts = [
         'enabled' => 'boolean',
         'config' => 'array',
     ];
 
     public function models()
     {
-        return ->hasMany(AiModel::class, 'provider_id');
+        return $this->hasMany(AiModel::class, 'provider_id');
     }
 }

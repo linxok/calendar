@@ -10,7 +10,7 @@ class CalendarSubscription extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = 'calendar_subscriptions';
+    protected $table = 'calendar_subscriptions';
             
     protected $fillable = [
                 'user_id',
@@ -22,7 +22,7 @@ class CalendarSubscription extends Model
         'access_count',
     ];
 
-    protected $fillable = [
+    protected $casts = [
         'is_active' => 'boolean',
         'access_count' => 'integer',
         'last_accessed_at' => 'datetime',
@@ -30,6 +30,6 @@ class CalendarSubscription extends Model
 
     public function user()
     {
-        return ->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 }

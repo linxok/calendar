@@ -10,7 +10,7 @@ class AiModel extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = 'ai_models';
+    protected $table = 'ai_models';
             
     protected $fillable = [
                 'provider_id',
@@ -23,7 +23,7 @@ class AiModel extends Model
         'capabilities',
     ];
 
-    protected $fillable = [
+    protected $casts = [
         'context_window' => 'integer',
         'cost_per_1k_input' => 'decimal:6',
         'cost_per_1k_output' => 'decimal:6',
@@ -33,6 +33,6 @@ class AiModel extends Model
 
     public function provider()
     {
-        return ->belongsTo(AiProvider::class, 'provider_id');
+        return $this->belongsTo(AiProvider::class, 'provider_id');
     }
 }

@@ -10,7 +10,7 @@ class ViberBotUser extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = 'viber_bot_users';
+    protected $table = 'viber_bot_users';
             
     protected $fillable = [
                 'user_id',
@@ -24,13 +24,13 @@ class ViberBotUser extends Model
         'last_message_at',
     ];
 
-    protected $fillable = [
+    protected $casts = [
         'state_data' => 'array',
         'last_message_at' => 'datetime',
     ];
 
     public function user()
     {
-        return ->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 }

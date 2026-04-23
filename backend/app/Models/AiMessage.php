@@ -10,7 +10,7 @@ class AiMessage extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = 'ai_messages';
+    protected $table = 'ai_messages';
             
     protected $fillable = [
                 'conversation_id',
@@ -21,12 +21,12 @@ class AiMessage extends Model
         'intent',
     ];
 
-    protected $fillable = [
+    protected $casts = [
         'tokens_used' => 'integer',
     ];
 
     public function conversation()
     {
-        return ->belongsTo(AiConversation::class, 'conversation_id');
+        return $this->belongsTo(AiConversation::class, 'conversation_id');
     }
 }

@@ -18,27 +18,23 @@ class MasterProfile extends Model
         'active_status',
     ];
 
-    protected $fillable = [
-        'active_status' => 'string',
-    ];
-
     public function user()
     {
-        return ->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function workingSchedules()
     {
-        return ->hasMany(WorkingSchedule::class, 'master_id');
+        return $this->hasMany(WorkingSchedule::class, 'master_id');
     }
 
     public function appointments()
     {
-        return ->hasMany(Appointment::class, 'master_id');
+        return $this->hasMany(Appointment::class, 'master_id');
     }
 
     public function aiRecommendations()
     {
-        return ->hasMany(AiRecommendation::class, 'master_id');
+        return $this->hasMany(AiRecommendation::class, 'master_id');
     }
 }
