@@ -41,4 +41,40 @@ export default function LoginPage() {
   };
 
   return (
-    <div className=min-h-screen
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle>Sign in to your account</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              label="Email address"
+              type="email"
+              required
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            />
+            <Input
+              label="Password"
+              type="password"
+              required
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            />
+            {error && <p className="text-sm text-red-600">{error}</p>}
+            <Button type="submit" className="w-full" isLoading={isLoading}>
+              Sign in
+            </Button>
+          </form>
+          <p className="mt-4 text-center text-sm text-gray-600">
+            Don&apos;t have an account?{' '}
+            <Link href="/register" className="text-blue-600 hover:text-blue-500">
+              Register here
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
