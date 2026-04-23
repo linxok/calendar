@@ -9,52 +9,52 @@ use Illuminate\Support\Str;
 
 class MasterService
 {
-    public function create(array ): MasterProfile
+    public function create(array $data): MasterProfile
     {
-         = User::create([
-            'name' => ['name'],
-            'email' => ['email'],
-            'phone' => ['phone'] ?? null,
-            'password' => Hash::make(['password'] ?? Str::random(12)),
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'] ?? null,
+            'password' => Hash::make($data['password'] ?? Str::random(12)),
             'role' => 'master',
             'status' => 'active',
         ]);
 
         return MasterProfile::create([
-            'user_id' => ->id,
-            'specialization' => ['specialization'] ?? null,
-            'photo_url' => ['photo_url'] ?? null,
+            'user_id' => $user->id,
+            'specialization' => $data['specialization'] ?? null,
+            'photo_url' => $data['photo_url'] ?? null,
             'active_status' => 'active',
         ]);
     }
 
-    public function update(MasterProfile , array ): MasterProfile
+    public function update(MasterProfile $master, array $data): MasterProfile
     {
-        if (isset(['name']) || isset(['email']) || isset(['phone'])) {
-             = array_intersect_key(, array_flip(['name', 'email', 'phone']));
-            ->user->update();
+        if (isset($data['name']) || isset($data['email']) || isset($data['phone'])) {
+            $userData = array_intersect_key($data, array_flip(['name', 'email', 'phone']));
+            $master->user->update($userData);
         }
 
-         = array_intersect_key(, array_flip(['specialization', 'photo_url', 'active_status']));
-        ->update();
+        $masterData = array_intersect_key($data, array_flip(['specialization', 'photo_url', 'active_status']));
+        $master->update($masterData);
 
-        return ->fresh();
+        return $master->fresh();
     }
 
-    public function deactivate(MasterProfile ): void
+    public function deactivate(MasterProfile $master): void
     {
-        ->update(['active_status' => 'inactive']);
-        ->user->update(['status' => 'inactive']);
+        $master->update(['active_status' => 'inactive']);
+        $master->user->update(['status' => 'inactive']);
     }
 
-    public function getActiveMasters(?string  = null)
+    public function getActiveMasters(?string $specialization = null)
     {
-         = MasterProfile::with('user')
+        $query = MasterProfile::with('user')
             ->where('active_status', 'active')
-            ->whereHas('user', function () {
-                ->where('status', 'active');
+            ->whereHas('user', function ($q) {
+                $q->where('status', 'active');
             });
 
-        return ->get();
+        return $query->get();
     }
 }

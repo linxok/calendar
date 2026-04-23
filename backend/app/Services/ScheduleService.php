@@ -8,55 +8,55 @@ use Carbon\Carbon;
 
 class ScheduleService
 {
-    public function createSchedule(MasterProfile , array ): WorkingSchedule
+    public function createSchedule(MasterProfile $master, array $data): WorkingSchedule
     {
-        ->validateNoOverlap(, );
+        $this->validateNoOverlap($master, $data);
 
         return WorkingSchedule::create([
-            'master_id' => ->id,
-            'day_of_week' => ['day_of_week'],
-            'start_time' => ['start_time'],
-            'end_time' => ['end_time'],
-            'breaks' => ['breaks'] ?? [],
+            'master_id' => $master->id,
+            'day_of_week' => $data['day_of_week'],
+            'start_time' => $data['start_time'],
+            'end_time' => $data['end_time'],
+            'breaks' => $data['breaks'] ?? [],
         ]);
     }
 
-    public function updateSchedule(WorkingSchedule , array ): WorkingSchedule
+    public function updateSchedule(WorkingSchedule $schedule, array $data): WorkingSchedule
     {
-        ->validateNoOverlap(->master, , ->id);
+        $this->validateNoOverlap($schedule->master, $data, $schedule->id);
 
-        ->update();
-        return ->fresh();
+        $schedule->update($data);
+        return $schedule->fresh();
     }
 
-    public function deleteSchedule(WorkingSchedule ): void
+    public function deleteSchedule(WorkingSchedule $schedule): void
     {
-        ->delete();
+        $schedule->delete();
     }
 
-    public function getMasterSchedule(MasterProfile , ?string  = null)
+    public function getMasterSchedule(MasterProfile $master, ?string $date = null)
     {
-         = WorkingSchedule::where('master_id', ->id);
+        $query = WorkingSchedule::where('master_id', $master->id);
 
-        if () {
-             = Carbon::parse()->dayOfWeek;
-            ->where('day_of_week', );
+        if ($date) {
+            $dayOfWeek = Carbon::parse($date)->dayOfWeek;
+            $query->where('day_of_week', $dayOfWeek);
         }
 
-        return ->get();
+        return $query->get();
     }
 
-    private function validateNoOverlap(MasterProfile , array , ?string  = null): void
+    private function validateNoOverlap(MasterProfile $master, array $data, ?string $excludeId = null): void
     {
-         = WorkingSchedule::where('master_id', ->id)
-            ->where('day_of_week', ['day_of_week']);
+        $query = WorkingSchedule::where('master_id', $master->id)
+            ->where('day_of_week', $data['day_of_week']);
 
-        if () {
-            ->where('id', '!=', );
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
         }
 
-         = ->first();
-        if () {
+        $existing = $query->first();
+        if ($existing) {
             throw new \Exception('Schedule for this day already exists');
         }
     }

@@ -6,25 +6,25 @@ use App\Models\Service;
 
 class ServiceManagementService
 {
-    public function create(array ): Service
+    public function create(array $data): Service
     {
         return Service::create([
-            'name' => ['name'],
-            'duration_min' => ['duration_min'],
-            'price' => ['price'] ?? null,
-            'active_status' => ['active_status'] ?? 'active',
+            'name' => $data['name'],
+            'duration_min' => $data['duration_min'],
+            'price' => $data['price'] ?? null,
+            'active_status' => $data['active_status'] ?? 'active',
         ]);
     }
 
-    public function update(Service , array ): Service
+    public function update(Service $service, array $data): Service
     {
-        ->update();
-        return ->fresh();
+        $service->update($data);
+        return $service->fresh();
     }
 
-    public function deactivate(Service ): void
+    public function deactivate(Service $service): void
     {
-        ->update(['active_status' => 'inactive']);
+        $service->update(['active_status' => 'inactive']);
     }
 
     public function getActiveServices()

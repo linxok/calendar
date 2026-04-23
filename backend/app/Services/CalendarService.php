@@ -70,4 +70,21 @@ class CalendarService
             'masters' => $result,
         ];
     }
+
+    public function getWeeklyView(string $startDate): array
+    {
+        $start = Carbon::parse($startDate);
+        $days = [];
+
+        for ($i = 0; $i < 7; $i++) {
+            $date = $start->copy()->addDays($i);
+            $days[] = $this->getDailyView($date->format('Y-m-d'));
+        }
+
+        return [
+            'week_start' => $startDate,
+            'week_end' => $start->copy()->addDays(6)->format('Y-m-d'),
+            'days' => $days,
+        ];
+    }
 }
