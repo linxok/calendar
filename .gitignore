@@ -1,0 +1,238 @@
+# ==============================================
+# IDE & Cache Directories
+# ==============================================
+.cache/
+.idea/
+.antigravity/
+.pnpm-store/
+
+# ==============================================
+# Environment & Secrets
+# ==============================================
+
+# Root environment (Docker Compose)
+.env
+.env.local
+.env.*.local
+
+# Keep examples
+!.env.example
+
+# ==============================================
+# Laravel Backend
+# ==============================================
+
+# Dependencies
+backend/vendor/
+backend/node_modules/
+
+# Environment
+backend/.env
+backend/.env.backup
+backend/.env.production
+!backend/.env.example
+
+# Laravel-specific
+backend/storage/*.key
+backend/.phpunit.result.cache
+backend/Homestead.json
+backend/Homestead.yaml
+backend/auth.json
+backend/npm-debug.log
+backend/yarn-error.log
+
+# Laravel Storage (keep structure, ignore content)
+backend/storage/app/*
+!backend/storage/app/.gitignore
+!backend/storage/app/public/
+backend/storage/app/public/*
+!backend/storage/app/public/.gitignore
+
+backend/storage/framework/cache/*
+!backend/storage/framework/cache/.gitignore
+!backend/storage/framework/cache/data/
+backend/storage/framework/cache/data/*
+!backend/storage/framework/cache/data/.gitignore
+
+backend/storage/framework/sessions/*
+!backend/storage/framework/sessions/.gitignore
+
+backend/storage/framework/testing/*
+!backend/storage/framework/testing/.gitignore
+
+backend/storage/framework/views/*
+!backend/storage/framework/views/.gitignore
+
+backend/storage/logs/*
+!backend/storage/logs/.gitignore
+
+# Laravel Bootstrap Cache
+backend/bootstrap/cache/*
+!backend/bootstrap/cache/.gitignore
+
+# Laravel Telescope (if installed)
+backend/storage/telescope/
+
+# ==============================================
+# Next.js Frontend
+# ==============================================
+
+# Dependencies
+frontend/node_modules/
+
+# Next.js build output
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/dist/
+
+# Production
+frontend/.vercel
+
+# Environment files (local only)
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/.env*.local
+
+# TypeScript auto-generated
+frontend/next-env.d.ts
+
+# Build info
+frontend/*.tsbuildinfo
+
+# Do NOT ignore pnpm-lock.yaml - it's needed for reproducible builds
+# frontend/pnpm-lock.yaml should be committed
+
+# ==============================================
+# pnpm (package manager)
+# ==============================================
+
+# pnpm store (if in project root)
+.pnpm-store/
+.pnpm-debug.log
+
+# Other package managers (if accidentally used)
+frontend/yarn.lock
+frontend/package-lock.json
+
+# ==============================================
+# Docker
+# ==============================================
+
+# Override files
+docker-compose.override.yml
+
+# Local Docker configs (if any)
+.docker/
+
+# ==============================================
+# IDE & Editors
+# ==============================================
+
+# PhpStorm / IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+.idea_modules/
+
+# VSCode (allow workspace settings)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# ==============================================
+# OS Files
+# ==============================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ==============================================
+# Logs & Databases
+# ==============================================
+
+*.log
+*.sql
+*.sqlite
+*.sqlite3
+
+# ==============================================
+# Temporary Files
+# ==============================================
+
+*.tmp
+*.temp
+*.cache
+*.bak
+*.backup
+*.old
+
+# ==============================================
+# Testing & Coverage
+# ==============================================
+
+coverage/
+.nyc_output/
+backend/coverage/
+frontend/coverage/
+
+# ==============================================
+# Documentation Build
+# ==============================================
+
+docs/_build/
+docs/.doctrees/
+
+# ==============================================
+# Security & Keys
+# ==============================================
+
+*.pem
+*.key
+!*.key.example
+*.crt
+*.cer
+*.p12
+*.pfx
+
+# AI Provider Keys
+**/openai_key*
+**/anthropic_key*
+**/*_api_key*
+
+# ==============================================
+# Misc
+# ==============================================
+
+.sass-cache/
+*.pid
+.grunt
