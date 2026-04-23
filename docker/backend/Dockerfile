@@ -57,12 +57,20 @@ RUN if [ -f composer.json ]; then \
         composer dump-autoload --optimize; \
     fi
 
+# Recreate www-data with UID/GID 1000 to match host user
+RUN deluser www-data 2>/dev/null || true \
+    && delgroup www-data 2>/dev/null || true \
+    && addgroup -g 1000 www-data \
+    && adduser -u 1000 -D -H -G www-data www-data
+
 # Set permissions (create directories if they don't exist)
 RUN mkdir -p storage/framework/{sessions,views,cache} \
     && mkdir -p bootstrap/cache \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 755 storage \
     && chmod -R 755 bootstrap/cache
+
+USER www-data
 
 # ============================================
 # Development stage
@@ -72,7 +80,8 @@ FROM base AS development
 # Install development dependencies
 RUN composer install --prefer-dist
 
-# Install Xdebug
+# Install Xdebug (requires root)
+USER root
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && pecl install xdebug \
     && docker-php-ext-enable xdebug \
@@ -82,6 +91,8 @@ RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
 RUN echo "xdebug.mode=develop,debug,coverage" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
+USER www-data
 
 EXPOSE 9000
 

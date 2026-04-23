@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Filament\Resources\Services\Schemas;
+
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
+
+class ServiceForm
+{
+    public static function configure(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                TextInput::make('name')
+                    ->required(),
+                TextInput::make('duration_min')
+                    ->required()
+                    ->numeric(),
+                TextInput::make('price')
+                    ->numeric()
+                    ->prefix('$'),
+                TextInput::make('active_status')
+                    ->required()
+                    ->default('active'),
+            ]);
+    }
+}
