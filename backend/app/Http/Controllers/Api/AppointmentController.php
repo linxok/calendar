@@ -44,6 +44,7 @@ class AppointmentController extends Controller
             'status' => $a->status,
             'source' => $a->source,
             'notes' => $a->notes,
+            'price' => $a->service->price,
         ]);
 
         return response()->json($appointments);
@@ -76,6 +77,7 @@ class AppointmentController extends Controller
                 'status' => $a->status,
                 'source' => $a->source,
                 'notes' => $a->notes,
+                'price' => $a->service->price,
             ]);
 
         return response()->json($appointments);
@@ -122,6 +124,7 @@ class AppointmentController extends Controller
             'source' => $a->source,
             'notes' => $a->notes,
             'client_id' => $a->client_id,
+            'price' => $a->service->price,
         ]);
 
         return response()->json($appointments);

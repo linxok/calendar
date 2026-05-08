@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Header } from '@/components/Header';
+import { api } from '@/lib/api';
 
 interface Service {
   id: string;
@@ -27,13 +28,12 @@ export default function HomePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [servicesRes, mastersRes] = await Promise.all([
-          fetch('http://localhost:8000/api/services'),
-          fetch('http://localhost:8000/api/masters'),
+        const [servicesData, mastersData] = await Promise.all([
+          api.services.list(),
+          api.masters.list(),
         ]);
-        
-        if (servicesRes.ok) setServices(await servicesRes.json());
-        if (mastersRes.ok) setMasters(await mastersRes.json());
+        setServices(servicesData);
+        setMasters(mastersData);
       } catch (error) {
         console.error('Failed to fetch data:', error);
       } finally {

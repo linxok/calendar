@@ -54,14 +54,21 @@ class MasterController extends Controller
             'email' => 'required|email|unique:users',
             'phone' => 'nullable|string|max:50',
             'specialization' => 'nullable|string|max:255',
-            'password' => 'required|string|min:8',
+            'password' => 'sometimes|string|min:8',
         ]);
+
+        if (empty($data['password'])) {
+            $data['password'] = \Illuminate\Support\Str::random(12);
+        }
 
         $master = $this->masterService->create($data);
 
         return response()->json([
             'id' => $master->id,
-            'message' => 'Master created successfully',
+            'name' => $master->user->name,
+            'email' => $master->user->email,
+            'phone' => $master->user->phone,
+            'specialization' => $master->specialization,
         ], 201);
     }
 

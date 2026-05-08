@@ -6,6 +6,9 @@ import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { useForm } from '@/hooks/useForm';
+import { validationPresets } from '@/lib/validation';
+import { api } from '@/lib/api';
 
 interface Service {
   id: string;
@@ -31,63 +34,58 @@ export default function BookingPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [masters, setMasters] = useState<Master[]>([]);
   const [slots, setSlots] = useState<TimeSlot[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  
-  const [formData, setFormData] = useState({
-    serviceId: '',
-    masterId: '',
-    date: '',
-    timeSlot: '',
-    clientName: '',
-    clientPhone: '',
+  const [serverError, setServerError] = useState('');
+
+  const form = useForm({
+    initialValues: {
+      serviceId: '',
+      masterId: '',
+      date: '',
+      timeSlot: '',
+      clientName: '',
+      clientPhone: '',
+    },
+    validationRules: {
+      clientName: validationPresets.name,
+      clientPhone: validationPresets.phone,
+      date: validationPresets.date,
+    },
   });
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/services')
-      .then(r => r.json())
-      .then(setServices);
-    fetch('http://localhost:8000/api/masters')
-      .then(r => r.json())
-      .then(setMasters);
+    api.services.list().then(setServices).catch(console.error);
+    api.masters.list().then(setMasters).catch(console.error);
   }, []);
 
   useEffect(() => {
-    if (formData.masterId && formData.serviceId && formData.date) {
-      fetch(`http://localhost:8000/api/availability?master_id=${formData.masterId}&service_id=${formData.serviceId}&date=${formData.date}`)
-        .then(r => r.json())
-        .then(data => setSlots(data.slots || []));
+    if (form.values.masterId && form.values.serviceId && form.values.date) {
+      api.availability
+        .getSlots({
+          master_id: form.values.masterId as string,
+          service_id: form.values.serviceId as string,
+          date: form.values.date as string,
+        })
+        .then((data) => setSlots(data.slots || []))
+        .catch(console.error);
     }
-  }, [formData.masterId, formData.serviceId, formData.date]);
+  }, [form.values.masterId, form.values.serviceId, form.values.date]);
 
   const handleSubmit = async () => {
-    setIsLoading(true);
-    setError('');
-    
+    setServerError('');
+
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8000/api/appointments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-        body: JSON.stringify({
-          master_id: formData.masterId,
-          service_id: formData.serviceId,
-          client_name: formData.clientName,
-          client_phone: formData.clientPhone,
-          start_at: `${formData.date} ${formData.timeSlot}`,
-        }),
+      await api.appointments.create({
+        master_id: form.values.masterId as string,
+        service_id: form.values.serviceId as string,
+        client_name: form.values.clientName as string,
+        client_phone: form.values.clientPhone as string,
+        start_at: `${form.values.date} ${form.values.timeSlot}`,
       });
-      
-      if (!res.ok) throw new Error('Booking failed');
-      
+
       router.push('/booking/success');
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Booking failed';
+      setServerError(errorMessage);
     }
   };
 
@@ -108,9 +106,9 @@ export default function BookingPage() {
                   {services.map((service) => (
                     <button
                       key={service.id}
-                      onClick={() => setFormData({ ...formData, serviceId: service.id })}
+                      onClick={() => form.setFieldValue('serviceId', service.id)}
                       className={`p-4 border rounded-lg text-left transition-colors ${
-                        formData.serviceId === service.id
+                        form.values.serviceId === service.id
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
@@ -124,7 +122,7 @@ export default function BookingPage() {
                 </div>
                 <Button 
                   onClick={() => setStep(2)} 
-                  disabled={!formData.serviceId}
+                  disabled={!form.values.serviceId}
                   className="w-full"
                 >
                   Continue
@@ -137,8 +135,8 @@ export default function BookingPage() {
                 <h3 className="font-medium">Select Master & Date</h3>
                 
                 <select
-                  value={formData.masterId}
-                  onChange={(e) => setFormData({ ...formData, masterId: e.target.value })}
+                  value={form.values.masterId}
+                  onChange={(e) => form.setFieldValue('masterId', e.target.value)}
                   className="w-full px-3 py-2 border rounded-lg"
                 >
                   <option value="">Choose a master</option>
@@ -150,8 +148,10 @@ export default function BookingPage() {
                 <Input
                   type="date"
                   label="Select Date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  value={form.values.date}
+                  onChange={(e) => form.setFieldValue('date', e.target.value)}
+                  onBlur={() => form.handleBlur('date')}
+                  error={form.touched.date ? form.errors.date : undefined}
                   min={new Date().toISOString().split('T')[0]}
                 />
 
@@ -160,9 +160,9 @@ export default function BookingPage() {
                     {slots.filter(s => s.available).map((slot) => (
                       <button
                         key={slot.start_time}
-                        onClick={() => setFormData({ ...formData, timeSlot: slot.start_time })}
+                        onClick={() => form.setFieldValue('timeSlot', slot.start_time)}
                         className={`p-2 border rounded text-sm ${
-                          formData.timeSlot === slot.start_time
+                          form.values.timeSlot === slot.start_time
                             ? 'border-blue-500 bg-blue-50'
                             : 'border-gray-200'
                         }`}
@@ -179,7 +179,7 @@ export default function BookingPage() {
                   </Button>
                   <Button 
                     onClick={() => setStep(3)} 
-                    disabled={!formData.masterId || !formData.date || !formData.timeSlot}
+                    disabled={!form.values.masterId || !form.values.date || !form.values.timeSlot}
                     className="flex-1"
                   >
                     Continue
@@ -194,20 +194,28 @@ export default function BookingPage() {
                 
                 <Input
                   label="Full Name"
-                  value={formData.clientName}
-                  onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
+                  value={form.values.clientName}
+                  onChange={(e) => form.handleChange('clientName', e.target.value)}
+                  onBlur={() => form.handleBlur('clientName')}
+                  error={form.touched.clientName ? form.errors.clientName : undefined}
                   required
                 />
                 
                 <Input
                   label="Phone Number"
                   type="tel"
-                  value={formData.clientPhone}
-                  onChange={(e) => setFormData({ ...formData, clientPhone: e.target.value })}
+                  value={form.values.clientPhone}
+                  onChange={(e) => form.handleChange('clientPhone', e.target.value)}
+                  onBlur={() => form.handleBlur('clientPhone')}
+                  error={form.touched.clientPhone ? form.errors.clientPhone : undefined}
                   required
                 />
 
-                {error && <p className="text-sm text-red-600">{error}</p>}
+                {serverError && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+                    <p className="text-sm text-red-600">{serverError}</p>
+                  </div>
+                )}
 
                 <div className="flex gap-3">
                   <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
@@ -215,8 +223,8 @@ export default function BookingPage() {
                   </Button>
                   <Button 
                     onClick={handleSubmit}
-                    isLoading={isLoading}
-                    disabled={!formData.clientName || !formData.clientPhone}
+                    isLoading={form.isSubmitting}
+                    disabled={!form.values.clientName || !form.values.clientPhone || !form.isValid}
                     className="flex-1"
                   >
                     Confirm Booking

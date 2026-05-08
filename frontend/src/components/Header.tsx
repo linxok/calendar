@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
-import { Calendar, Scissors, Sparkles, LayoutDashboard, Briefcase } from 'lucide-react';
+import { NotificationBell } from '@/components/NotificationBell';
+import { Calendar, Scissors, Sparkles, LayoutDashboard, Briefcase, ShieldCheck } from 'lucide-react';
 
 export function Header() {
   const isAuthenticated = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -48,6 +49,13 @@ export function Header() {
             {isAuthenticated ? (
               <>
                 <Link
+                  href="/admin"
+                  className="flex items-center gap-2 text-rose-600 hover:text-rose-800 transition-colors"
+                >
+                  <ShieldCheck size={18} />
+                  <span className="hidden sm:inline">Admin</span>
+                </Link>
+                <Link
                   href="/master-dashboard"
                   className="flex items-center gap-2 text-amber-600 hover:text-amber-800 transition-colors"
                 >
@@ -61,6 +69,7 @@ export function Header() {
                   <LayoutDashboard size={18} />
                   <span className="hidden sm:inline">Dashboard</span>
                 </Link>
+                <NotificationBell />
                 <Button variant="outline" size="sm" onClick={logout}>
                   Logout
                 </Button>
