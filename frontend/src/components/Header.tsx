@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { Calendar, Scissors, Sparkles, LayoutDashboard, Briefcase } from 'lucide-react';
 
 export function Header() {
   const isAuthenticated = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -18,12 +19,52 @@ export function Header() {
           <Link href="/" className="text-xl font-bold text-gray-900">
             Beauty Salon Booking
           </Link>
-          
+
           <nav className="flex items-center gap-4">
+            <Link
+              href="/booking"
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <Scissors size={18} />
+              <span className="hidden sm:inline">Book Now</span>
+            </Link>
+
+            <Link
+              href="/calendar"
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <Calendar size={18} />
+              <span className="hidden sm:inline">Calendar</span>
+            </Link>
+
+            <Link
+              href="/ai-assistant"
+              className="flex items-center gap-2 text-purple-600 hover:text-purple-800 transition-colors"
+            >
+              <Sparkles size={18} />
+              <span className="hidden sm:inline">AI Assistant</span>
+            </Link>
+
             {isAuthenticated ? (
-              <Button variant="outline" size="sm" onClick={logout}>
-                Logout
-              </Button>
+              <>
+                <Link
+                  href="/master-dashboard"
+                  className="flex items-center gap-2 text-amber-600 hover:text-amber-800 transition-colors"
+                >
+                  <Briefcase size={18} />
+                  <span className="hidden sm:inline">Master</span>
+                </Link>
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  <LayoutDashboard size={18} />
+                  <span className="hidden sm:inline">Dashboard</span>
+                </Link>
+                <Button variant="outline" size="sm" onClick={logout}>
+                  Logout
+                </Button>
+              </>
             ) : (
               <>
                 <Link href="/login">

@@ -58,6 +58,11 @@ export const api = {
   },
   appointments: {
     list: () => fetchApi('/appointments'),
+    my: () => fetchApi('/my-appointments'),
+    master: (params?: { date?: string; status?: string; from?: string; to?: string }) => {
+      const query = params ? new URLSearchParams(params).toString() : '';
+      return fetchApi(`/master/appointments${query ? `?${query}` : ''}`);
+    },
     get: (id: string) => fetchApi(`/appointments/${id}`),
     create: (data: {
       master_id: string;
@@ -67,6 +72,8 @@ export const api = {
       start_at: string;
       notes?: string;
     }) => fetchApi('/appointments', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: string, data: { status?: string; start_at?: string; notes?: string }) =>
+      fetchApi(`/appointments/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     cancel: (id: string) => fetchApi(`/appointments/${id}`, { method: 'DELETE' }),
   },
   calendar: {

@@ -30,7 +30,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('masters', MasterController::class)->except(['index', 'show']);
     Route::apiResource('services', ServiceController::class)->except(['index', 'show']);
     Route::apiResource('appointments', AppointmentController::class);
-    
+
+    Route::get('/my-appointments', [AppointmentController::class, 'myAppointments']);
+    Route::get('/master/appointments', [AppointmentController::class, 'masterAppointments']);
+
     Route::get('/masters/{masterId}/schedules', [ScheduleController::class, 'index']);
     Route::post('/masters/{masterId}/schedules', [ScheduleController::class, 'store']);
     Route::put('/masters/{masterId}/schedules/{scheduleId}', [ScheduleController::class, 'update']);
