@@ -6,41 +6,54 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Link from 'next/link';
+import { useForm } from '@/hooks/useForm';
+import { validationPresets } from '@/lib/validation';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    password: '',
-  });
+  const [serverError, setServerError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
-    
-    try {
-      const res = await fetch('http://localhost:8000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      
-      if (!res.ok) throw new Error('Registration failed');
-      
-      const data = await res.json();
-      localStorage.setItem('token', data.token);
-      router.push('/');
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const form = useForm({
+    initialValues: {
+      name: '',
+      email: '',
+      phone: '',
+      password: '',
+    },
+    validationRules: {
+      name: validationPresets.name,
+      email: validationPresets.email,
+      phone: validationPresets.phone,
+      password: {
+        required: true,
+        minLength: 8,
+        pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/,
+      },
+    },
+    onSubmit: async (values) => {
+      setServerError('');
+
+      try {
+        const res = await fetch('http://localhost:8000/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(values),
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Registration failed');
+        }
+
+        const data = await res.json();
+        localStorage.setItem('token', data.token);
+        router.push('/');
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Registration failed';
+        setServerError(errorMessage);
+      }
+    },
+  });
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
@@ -49,37 +62,52 @@ export default function RegisterPage() {
           <CardTitle>Create your account</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={form.handleSubmit} className="space-y-4">
             <Input
               label="Full name"
               type="text"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              value={form.values.name}
+              onChange={(e) => form.handleChange('name', e.target.value)}
+              onBlur={() => form.handleBlur('name')}
+              error={form.touched.name ? form.errors.name : undefined}
             />
             <Input
               label="Email address"
               type="email"
-              required
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              value={form.values.email}
+              onChange={(e) => form.handleChange('email', e.target.value)}
+              onBlur={() => form.handleBlur('email')}
+              error={form.touched.email ? form.errors.email : undefined}
             />
             <Input
               label="Phone number"
               type="tel"
-              required
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              value={form.values.phone}
+              onChange={(e) => form.handleChange('phone', e.target.value)}
+              onBlur={() => form.handleBlur('phone')}
+              error={form.touched.phone ? form.errors.phone : undefined}
+              placeholder="+1 (555) 123-4567"
             />
             <Input
               label="Password"
               type="password"
-              required
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              value={form.values.password}
+              onChange={(e) => form.handleChange('password', e.target.value)}
+              onBlur={() => form.handleBlur('password')}
+              error={form.touched.password ? form.errors.password : undefined}
+              hint="At least 8 characters with uppercase, lowercase and number"
             />
-            {error && <p className="text-sm text-red-600">{error}</p>}
-            <Button type="submit" className="w-full" isLoading={isLoading}>
+            {serverError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-600">{serverError}</p>
+              </div>
+            )}
+            <Button
+              type="submit"
+              className="w-full"
+              isLoading={form.isSubmitting}
+              disabled={!form.isValid && Object.keys(form.touched).length > 0}
+            >
               Create account
             </Button>
           </form>

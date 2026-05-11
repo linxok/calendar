@@ -52,11 +52,6 @@ RUN if [ -f composer.json ]; then \
 # Copy application code
 COPY . .
 
-# Generate optimized autoload if composer.json exists
-RUN if [ -f composer.json ]; then \
-        composer dump-autoload --optimize; \
-    fi
-
 # Recreate www-data with UID/GID 1000 to match host user
 RUN deluser www-data 2>/dev/null || true \
     && delgroup www-data 2>/dev/null || true \
@@ -77,11 +72,15 @@ USER www-data
 # ============================================
 FROM base AS development
 
+USER root
+
+# Generate autoload with full code present
+RUN if [ -f composer.json ]; then \
+        composer dump-autoload --optimize; \
+    fi
+
 # Install development dependencies
 RUN composer install --prefer-dist
-
-# Install Xdebug (requires root)
-USER root
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && pecl install xdebug \
     && docker-php-ext-enable xdebug \

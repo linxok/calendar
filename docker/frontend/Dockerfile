@@ -1,4 +1,4 @@
-# Multi-stage Dockerfile for Next.js 14
+# Multi-stage Dockerfile for Next.js (using npm)
 FROM node:20-alpine AS base
 
 # Install dependencies only when needed
@@ -6,9 +6,9 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY package.json pnpm-lock.yaml* ./
-RUN corepack enable pnpm && pnpm install --frozen-lockfile
+# Copy package files
+COPY package.json package-lock.json* ./
+RUN npm install
 
 # ============================================
 # Development stage
@@ -20,9 +20,6 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Enable pnpm
-RUN corepack enable pnpm
-
 # Expose port
 EXPOSE 3000
 
@@ -30,7 +27,7 @@ EXPOSE 3000
 ENV NODE_ENV=development
 
 # Start Next.js in development mode
-CMD ["pnpm", "dev"]
+CMD ["npm", "run", "dev"]
 
 # ============================================
 # Builder stage for production
@@ -42,15 +39,12 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Enable pnpm
-RUN corepack enable pnpm
-
 # Set environment variables for build
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
 # Build Next.js application
-RUN pnpm build
+RUN npm run build
 
 # ============================================
 # Production stage

@@ -56,7 +56,10 @@ class ServiceController extends Controller
 
         return response()->json([
             'id' => $service->id,
-            'message' => 'Service created successfully',
+            'name' => $service->name,
+            'duration_min' => $service->duration_min,
+            'price' => $service->price,
+            'active_status' => $service->active_status,
         ], 201);
     }
 
