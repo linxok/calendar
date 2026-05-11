@@ -18,11 +18,10 @@ class BookingSettingSeeder extends Seeder
         ];
 
         foreach ($settings as $setting) {
-            BookingSetting::create([
-                'id' => Str::uuid(),
-                'key' => $setting['key'],
-                'value' => json_encode($setting['value']),
-            ]);
+            BookingSetting::updateOrCreate(
+                ['key' => $setting['key']],
+                ['value' => json_encode($setting['value'])],
+            );
         }
     }
 }
