@@ -10,31 +10,37 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::create([
-            'name' => 'Administrator',
-            'email' => 'admin@salon.com',
-            'phone' => '+380991234567',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-            'status' => 'active',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@salon.com'],
+            [
+                'name' => 'Administrator',
+                'phone' => '+380991234567',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'status' => 'active',
+            ]
+        );
 
-        User::create([
-            'name' => 'Anna Stylist',
-            'email' => 'anna@salon.com',
-            'phone' => '+380992345678',
-            'password' => Hash::make('password'),
-            'role' => 'master',
-            'status' => 'active',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'anna@salon.com'],
+            [
+                'name' => 'Anna Stylist',
+                'phone' => '+380992345678',
+                'password' => Hash::make('password'),
+                'role' => 'master',
+                'status' => 'active',
+            ]
+        );
 
-        User::create([
-            'name' => 'Client User',
-            'email' => 'client@example.com',
-            'phone' => '+380993456789',
-            'password' => Hash::make('password'),
-            'role' => 'client',
-            'status' => 'active',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'client@example.com'],
+            [
+                'name' => 'Client User',
+                'phone' => '+380993456789',
+                'password' => Hash::make('password'),
+                'role' => 'client',
+                'status' => 'active',
+            ]
+        );
     }
 }

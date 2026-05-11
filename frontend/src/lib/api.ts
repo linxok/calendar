@@ -1,7 +1,7 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 async function fetchApi(endpoint: string, options: RequestInit = {}) {
-  const url = `${API_URL}/api${endpoint}`;
+  const url = `${API_URL}${endpoint}`;
   
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -10,7 +10,7 @@ async function fetchApi(endpoint: string, options: RequestInit = {}) {
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
   }
 
   const response = await fetch(url, {
@@ -58,6 +58,11 @@ export const api = {
   },
   appointments: {
     list: () => fetchApi('/appointments'),
+    my: () => fetchApi('/my-appointments'),
+    master: (params?: { date?: string; status?: string; from?: string; to?: string }) => {
+      const query = params ? new URLSearchParams(params).toString() : '';
+      return fetchApi(`/master/appointments${query ? `?${query}` : ''}`);
+    },
     get: (id: string) => fetchApi(`/appointments/${id}`),
     create: (data: {
       master_id: string;
@@ -67,10 +72,53 @@ export const api = {
       start_at: string;
       notes?: string;
     }) => fetchApi('/appointments', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: string, data: { status?: string; start_at?: string; notes?: string }) =>
+      fetchApi(`/appointments/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     cancel: (id: string) => fetchApi(`/appointments/${id}`, { method: 'DELETE' }),
   },
   calendar: {
     daily: (date: string) => fetchApi(`/calendar/daily?date=${date}`),
     weekly: (startDate: string) => fetchApi(`/calendar/weekly?start_date=${startDate}`),
+  },
+  notifications: {
+    list: () => fetchApi('/notifications'),
+    stats: () => fetchApi('/notifications/stats'),
+    unreadCount: () => fetchApi('/notifications/unread-count'),
+    markAsRead: (id: string) => fetchApi(`/notifications/${id}/read`, { method: 'POST' }),
+  },
+  ai: {
+    chat: (data: { message: string; conversation_id?: string }) =>
+      fetchApi('/ai/chat', { method: 'POST', body: JSON.stringify(data) }),
+    conversations: () => fetchApi('/ai/conversations'),
+    recommendations: () => fetchApi('/ai/recommendations'),
+    acceptRecommendation: (id: string) =>
+      fetchApi(`/ai/recommendations/${id}/accept`, { method: 'POST' }),
+    dismissRecommendation: (id: string) =>
+      fetchApi(`/ai/recommendations/${id}/dismiss`, { method: 'POST' }),
+  },
+  admin: {
+    masters: {
+      create: (data: { name: string; email: string; phone?: string; specialization?: string }) =>
+        fetchApi('/masters', { method: 'POST', body: JSON.stringify(data) }),
+      update: (id: string, data: Partial<{ name: string; email: string; phone: string; specialization: string; is_active: boolean }>) =>
+        fetchApi(`/masters/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+      delete: (id: string) => fetchApi(`/masters/${id}`, { method: 'DELETE' }),
+    },
+    services: {
+      create: (data: { name: string; duration_min: number; price?: number; description?: string }) =>
+        fetchApi('/services', { method: 'POST', body: JSON.stringify(data) }),
+      update: (id: string, data: Partial<{ name: string; duration_min: number; price: number; description: string; is_active: boolean }>) =>
+        fetchApi(`/services/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+      delete: (id: string) => fetchApi(`/services/${id}`, { method: 'DELETE' }),
+    },
+    schedules: {
+      list: (masterId: string) => fetchApi(`/masters/${masterId}/schedules`),
+      create: (masterId: string, data: { day_of_week: number; start_time: string; end_time: string; breaks?: { start: string; end: string }[] }) =>
+        fetchApi(`/masters/${masterId}/schedules`, { method: 'POST', body: JSON.stringify(data) }),
+      update: (masterId: string, scheduleId: string, data: { start_time?: string; end_time?: string; is_active?: boolean }) =>
+        fetchApi(`/masters/${masterId}/schedules/${scheduleId}`, { method: 'PUT', body: JSON.stringify(data) }),
+      delete: (masterId: string, scheduleId: string) =>
+        fetchApi(`/masters/${masterId}/schedules/${scheduleId}`, { method: 'DELETE' }),
+    },
   },
 };

@@ -1,52 +1,63 @@
-# Quick Start Guide
+# Quick Start Guide — Glow Studio
 
-## Перший запуск (одна команда)
+## 🚀 Перший запуск
+
+### 1. Підготовка середовища
 
 ```bash
-# 1. Ініціалізувати проєкти Laravel та Next.js
-make init
+# Копіювати налаштування середовища
+cp .env.example .env
 
-# 2. Запустити development середовище
-make dev-setup
+# Перевірити змінні в .env (опціонально)
+nano .env
 ```
 
-Готово! Доступ до сервісів:
-- 🌐 **Frontend**: http://localhost:3000
-- 🔧 **Backend API**: http://localhost:8000/api
-- ⚙️ **Filament Admin**: http://localhost:8000/admin
-- 📧 **Mailhog**: http://localhost:8025
-- 🗄️ **Adminer**: http://localhost:8080
+### 2. Запуск контейнерів
+
+```bash
+# Запустити всі сервіси
+make dev
+
+# Або через Docker Compose
+docker compose up -d
+```
+
+### 3. Ініціалізація backend (перший запуск)
+
+```bash
+# Встановити залежності Laravel
+make shell-backend
+# всередині контейнера:
+composer install
+php artisan key:generate
+php artisan migrate
+php artisan db:seed
+exit
+```
+
+Готово! 🎉 Доступ до сервісів:
+
+| Сервіс | URL |
+|--------|-----|
+| 🌐 **Frontend** | http://localhost:3000 |
+| 🔧 **Backend API** | http://localhost:8000/api |
+| ⚙️ **Filament Admin** | http://localhost:8000/admin |
+| 📧 **Mailhog** | http://localhost:8025 |
+| 🗄️ **Adminer** | http://localhost:8080 |
 
 ---
 
-## Що відбувається при `make init`?
+## 📋 Що запускається
 
-1. Створюється Laravel 11 проєкт в `backend/`
-2. Створюється Next.js 14 проєкт з TypeScript в `frontend/`
-3. Копіюється `.env.example` → `.env`
-
-## Що відбувається при `make dev-setup`?
-
-1. Запускаються Docker контейнери:
-   - PostgreSQL 15 (база даних)
-   - Redis 7 (кеш та черги)
-   - Laravel Backend + Nginx
-   - Next.js Frontend
-   - Queue Worker
-   - Scheduler
-   - Mailhog (тестування email)
-   - Adminer (GUI для БД)
-
-2. Встановлюються залежності:
-   - `composer install` для Laravel
-   - Генерується `APP_KEY`
-   - Створюється symlink для storage
-
-3. Налаштовується база даних:
-   - Запускаються міграції
-   - Заповнюється тестовими даними (seeding)
-
-4. Встановлюється Filament Admin Panel
+- **PostgreSQL 15** — база даних
+- **Redis 7** — кеш та черги
+- **Laravel 11** — backend API (PHP 8.4)
+- **Nginx** — reverse proxy
+- **Next.js 16** — frontend (React 19 + TypeScript)
+- **Queue Worker** — обробка завдань
+- **Scheduler** — cron завдання
+- **Mailhog** — тестування email
+- **Adminer** — GUI для БД
 
 ---
 
@@ -92,39 +103,49 @@ make clean         # Видалити контейнери та volumes
 
 ---
 
-## Структура проєкту
+## 🏗️ Структура проекту
 
 ```
 calendar/
 ├── backend/              # Laravel 11 API
 │   ├── app/
-│   ├── routes/
+│   │   ├── Http/Controllers/   # API контролери
+│   │   ├── Models/            # Eloquent моделі
+│   │   └── Filament/          # Admin панель
+│   ├── routes/api.php         # API роути
 │   ├── database/
-│   └── (Laravel код без Dockerfile)
-├── frontend/             # Next.js 14 Frontend
+│   │   ├── migrations/        # Міграції
+│   │   └── seeders/           # Seeders
+│   └── bootstrap/
+├── frontend/             # Next.js 16 + React 19
 │   ├── src/
-│   │   ├── app/
-│   │   └── components/
-│   └── (Next.js код без Dockerfile)
+│   │   ├── app/              # App Router pages
+│   │   │   ├── page.tsx      # Головна сторінка
+│   │   │   ├── booking/      # Онлайн-запис
+│   │   │   ├── dashboard/    # Кабінет клієнта
+│   │   │   ├── admin/        # Admin панель
+│   │   │   ├── ai-assistant/ # AI чат
+│   │   │   └── ...
+│   │   ├── components/       # React компоненти
+│   │   │   ├── ui/          # UI компоненти
+│   │   │   ├── ai/          # AI компоненти
+│   │   │   └── calendar/    # Календар
+│   │   ├── lib/
+│   │   │   └── api.ts       # API utility
+│   │   └── app/globals.css   # Глобальні стилі
+│   ├── public/
+│   └── package.json
 ├── docker/               # Docker конфігурація
-│   ├── backend/
-│   │   └── Dockerfile    # Backend Dockerfile
-│   ├── frontend/
-│   │   └── Dockerfile    # Frontend Dockerfile
+│   ├── backend/Dockerfile
+│   ├── frontend/Dockerfile    # Використовує npm
 │   ├── nginx/
-│   │   ├── dev.conf
-│   │   └── prod.conf
-│   ├── php/
-│   │   ├── php.ini
-│   │   └── opcache.ini
-│   └── supervisor/
-│       └── supervisord.conf
-├── docker-compose.yml    # Development
-├── docker-compose.prod.yml # Production
-├── Makefile              # Команди
-├── init-project.sh       # Скрипт ініціалізації
-├── .env                  # Змінні середовища
-└── DOCKER.md            # Детальна документація
+│   └── php/
+├── docker-compose.yml
+├── docker-compose.prod.yml
+├── Makefile
+├── DESIGN_SYSTEM.md      # Дизайн-система
+├── API.md              # Документація API
+└── AI.md               # AI функціонал
 ```
 
 ---
@@ -145,19 +166,32 @@ FRONTEND_PORT=3001
 DB_PORT=5433
 ```
 
-### Проблеми з правами доступу
+### Frontend не запускається (проблеми з npm/pnpm)
+
+Проект використовує **npm** (не pnpm) через сумісність з Node 20:
+
 ```bash
-# Linux: додайте свого користувача до групи docker
+# Перебудувати frontend
+make shell-frontend
+rm -rf node_modules package-lock.json
+npm install
+exit
+docker restart calendar_frontend_dev
+```
+
+### Проблеми з правами доступу (Linux)
+```bash
 sudo usermod -aG docker $USER
 newgrp docker
 ```
 
 ### Контейнери не запускаються
 ```bash
-# Перебудувати з нуля
+# Очистити та перебудувати
 make clean
-make dev-build
-make dev-setup
+docker system prune -f
+docker compose build --no-cache
+docker compose up -d
 ```
 
 ### База даних недоступна
@@ -166,34 +200,59 @@ make dev-setup
 make ps
 
 # Переглянути логи PostgreSQL
-docker-compose logs postgres
+docker compose logs postgres
+
+# Перезапустити БД
+docker compose restart postgres
 ```
 
 ---
 
-## Наступні кроки
+## ✅ Реалізований функціонал
 
-1. **Налаштувати аутентифікацію**
-   - Створити моделі та міграції для користувачів
-   - Налаштувати Laravel Sanctum
+### Backend (Laravel 11)
+- ✅ API аутентифікація (Sanctum)
+- ✅ CRUD для записів (Appointments)
+- ✅ CRUD для майстрів (Masters)
+- ✅ CRUD для послуг (Services)
+- ✅ CRUD для розкладу (Schedules)
+- ✅ AI-контролер (чат, рекомендації)
+- ✅ Filament Admin панель
 
-2. **Створити API endpoints**
-   - Контролери для запису
-   - Контролери для майстрів
-   - Контролери для послуг
+### Frontend (Next.js 16 + React 19)
+- ✅ Сучасний дизайн з Tailwind CSS
+- ✅ Головна сторінка з Hero-секцією
+- ✅ Сторінка онлайн-запису (booking)
+- ✅ Кабінет клієнта (dashboard)
+- ✅ AI-асистент з чатом
+- ✅ Admin панель (/admin/*)
+- ✅ Календар перегляду
+- ✅ Розклад майстра
 
-3. **Налаштувати Filament Admin**
-   - Resources для управління
-   - Dashboard widgets
+### Дизайн-система
+- ✅ Кольорова палітра (pink/rose/violet)
+- ✅ Типографіка (Inter + Playfair Display)
+- ✅ Анімації та glassmorphism
+- ✅ Компоненти UI (Button, Card)
 
-4. **Розробити Frontend**
-   - Сторінка бронювання
-   - Календар
-   - Профіль користувача
+---
 
-5. **Інтегрувати комунікації**
-   - Telegram Bot
-   - Email notifications
-   - SMS
+## 🎯 Наступні кроки
 
-Детальніше в `TASKS.md` та `DOCKER.md`
+1. **AI інтеграція**
+   - Підключити OpenAI/Anthropic API
+   - Покращити рекомендації
+
+2. **Повідомлення**
+   - Telegram Bot інтеграція
+   - Email/SMS сповіщення
+
+3. **Календар**
+   - Місячний вид (monthly view)
+   - Експорт в Google Calendar
+
+4. **Профіль**
+   - Сторінка налаштувань (/profile)
+   - Управління каналами зв'язку
+
+Детальніше в `TASKS.md`
