@@ -52,11 +52,6 @@ RUN if [ -f composer.json ]; then \
 # Copy application code
 COPY . .
 
-# Generate optimized autoload if composer.json exists
-RUN if [ -f composer.json ]; then \
-        composer dump-autoload --optimize; \
-    fi
-
 # Recreate www-data with UID/GID 1000 to match host user
 RUN deluser www-data 2>/dev/null || true \
     && delgroup www-data 2>/dev/null || true \
@@ -76,6 +71,11 @@ USER www-data
 # Development stage
 # ============================================
 FROM base AS development
+
+# Generate autoload with full code present
+RUN if [ -f composer.json ]; then \
+        composer dump-autoload --optimize; \
+    fi
 
 # Install development dependencies
 RUN composer install --prefer-dist
