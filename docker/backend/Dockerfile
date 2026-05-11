@@ -72,6 +72,8 @@ USER www-data
 # ============================================
 FROM base AS development
 
+USER root
+
 # Generate autoload with full code present
 RUN if [ -f composer.json ]; then \
         composer dump-autoload --optimize; \
@@ -79,9 +81,6 @@ RUN if [ -f composer.json ]; then \
 
 # Install development dependencies
 RUN composer install --prefer-dist
-
-# Install Xdebug (requires root)
-USER root
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && pecl install xdebug \
     && docker-php-ext-enable xdebug \

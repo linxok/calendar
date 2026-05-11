@@ -1,7 +1,7 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 async function fetchApi(endpoint: string, options: RequestInit = {}) {
-  const url = `${API_URL}/api${endpoint}`;
+  const url = `${API_URL}${endpoint}`;
   
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -10,7 +10,7 @@ async function fetchApi(endpoint: string, options: RequestInit = {}) {
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
   }
 
   const response = await fetch(url, {
